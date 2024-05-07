@@ -29,7 +29,7 @@ class RemoteSyncer with ChangeNotifier {
 
   void invalidateWallabagInstance() => _storage = null;
 
-  int get pendingCount => db.remoteActions.countSync();
+  int get pendingCount => db.remoteActions.count();
 
   bool _isWorking = false;
   bool get isWorking => _isWorking;
@@ -62,10 +62,10 @@ class RemoteSyncer with ChangeNotifier {
 
   void add(RemoteSyncAction action) {
     final existing =
-        db.remoteActions.filter().keyEqualTo(action.hashCode).findFirstSync();
+        db.remoteActions.where().keyCodeEqualTo(action.hashCode).findFirst();
     if (existing == null) {
-      db.writeTxnSync(
-          () => db.remoteActions.putSync(RemoteAction.fromRSA(action)));
+      db.write((db) => db.remoteActions
+          .put(RemoteAction.fromRSA(db.remoteActions.autoIncrement(), action)));
     }
   }
 
@@ -102,13 +102,13 @@ class RemoteSyncer with ChangeNotifier {
     int i = 1;
     int actionsCount = 0;
     do {
-      final actions = db.remoteActions.where().sortByCreatedAt().findAllSync();
+      final actions = db.remoteActions.where().sortByCreatedAt().findAll();
       actionsCount += actions.length;
       for (final action in actions) {
         final rsa = action.toRSA();
         _log.info('running action: $rsa');
         await rsa.execute(this);
-        db.writeTxnSync(() => db.remoteActions.deleteSync(action.id!));
+        db.write((db) => db.remoteActions.delete(action.id));
         progressValue = i / actionsCount;
         i++;
       }
