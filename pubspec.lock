@@ -321,14 +321,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.6"
-  dartx:
-    dependency: transitive
-    description:
-      name: dartx
-      sha256: "8b25435617027257d43e6508b5fe061012880ddfdaa75a71d607c3de2a13d244"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.0"
   dynamic_color:
     dependency: transitive
     description:
@@ -643,26 +635,18 @@ packages:
     dependency: "direct main"
     description:
       name: isar
-      sha256: e7135ff16ae4e4624bce608757b2d22aeeeb09225d9f16ec3e3a5c9f3d05e66a
+      sha256: "6bb67f9844a643d1a925b0b8018e27bec1f79c6ae23e0671a8ec87fa2d48cf78"
       url: "https://pub.isar-community.dev"
     source: hosted
-    version: "3.1.7"
+    version: "4.0.3"
   isar_flutter_libs:
     dependency: "direct main"
     description:
       name: isar_flutter_libs
-      sha256: cb2cc60aac929ca190c0332d10417cab405f666dc96773ab66eb2958866a5e20
+      sha256: "60c52866fb407ca9f9234977bc006249521408eea284c3625d477c602f640b0d"
       url: "https://pub.isar-community.dev"
     source: hosted
-    version: "3.1.7"
-  isar_generator:
-    dependency: "direct dev"
-    description:
-      name: isar_generator
-      sha256: "9409d8c95abc67953165dea302f75d957cd40965fcbcd0134ab2b2e4c5e35042"
-      url: "https://pub.isar-community.dev"
-    source: hosted
-    version: "3.1.7"
+    version: "4.0.3"
   js:
     dependency: transitive
     description:
@@ -1316,14 +1300,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.5.9"
-  time:
-    dependency: transitive
-    description:
-      name: time
-      sha256: ad8e018a6c9db36cb917a031853a1aae49467a93e0d464683e029537d848c221
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.4"
   timing:
     dependency: transitive
     description:
@@ -1516,14 +1492,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.5.0"
-  xxh3:
-    dependency: transitive
-    description:
-      name: xxh3
-      sha256: a92b30944a9aeb4e3d4f3c3d4ddb3c7816ca73475cd603682c4f8149690f56d7
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.1"
   yaml:
     dependency: transitive
     description:

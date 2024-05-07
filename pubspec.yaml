@@ -21,7 +21,7 @@ version: 1.0.10+31
 environment:
   sdk: ">=3.0.5 <4.0.0"
 
-isar_version: &isar_version 3.1.7
+isar_version: &isar_version 4.0.3
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -86,9 +86,6 @@ dev_dependencies:
   riverpod_lint: ^2.3.9
 
   build_runner: any
-  isar_generator:
-    version: *isar_version
-    hosted: https://pub.isar-community.dev/
   json_serializable: ^6.7.0
   riverpod_generator: ^2.3.11
   emulators: ^0.5.1
