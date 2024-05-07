@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 // Themes
@@ -47,8 +48,8 @@ const int logCountResetThreshold = 1000;
 // Features flags and constants
 
 final isDesktopPlatform =
-    Platform.isLinux || Platform.isMacOS || Platform.isWindows;
-final isMobilePlatform = Platform.isAndroid || Platform.isIOS;
+    kIsWeb || Platform.isLinux || Platform.isMacOS || Platform.isWindows;
+final isMobilePlatform = !kIsWeb && (Platform.isAndroid || Platform.isIOS);
 
 final appBadgeSupported = isMobilePlatform || Platform.isMacOS;
 const appGroupId = 'group.net.casimir-lab.frigoligo';

@@ -47,7 +47,9 @@ class CredentialsManager {
   CredentialsManager({this.autoSync = true});
 
   Future<void> init({Credentials? initial}) async {
-    if (Platform.isIOS) await SharedPreferenceAppGroup.setAppGroup(appGroupId);
+    if (!kIsWeb && Platform.isIOS) {
+      await SharedPreferenceAppGroup.setAppGroup(appGroupId);
+    }
     if (initial == null && autoSync) await load();
     if (initial != null) credentials = initial;
   }
@@ -72,7 +74,7 @@ class CredentialsManager {
   bool get tokenIsExpired => token!.isExpired;
 
   Future<String?> _loadString(key) async {
-    if (Platform.isIOS) {
+    if (!kIsWeb && Platform.isIOS) {
       return await SharedPreferenceAppGroup.get(key);
     } else {
       return SharedPreferences.getInstance()

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
@@ -17,17 +18,28 @@ class DB {
   static Future<void> init(bool devmode) async {
     if (_instance != null) return;
 
-    final dir = await getApplicationDocumentsDirectory();
-    _instance = Isar.open(
-      schemas: [
-        AppLogSchema,
-        ArticleSchema,
-        ArticleScrollPositionSchema,
-        RemoteActionSchema,
-      ],
-      directory: dir.path,
-      name: 'frigoligo${devmode ? '-dev' : ''}',
-    );
+    final schemas = [
+      AppLogSchema,
+      ArticleSchema,
+      ArticleScrollPositionSchema,
+      RemoteActionSchema,
+    ];
+    if (!kIsWeb) {
+      final dir = await getApplicationDocumentsDirectory();
+      _instance = Isar.open(
+        schemas: schemas,
+        directory: dir.path,
+        name: 'frigoligo${devmode ? '-dev' : ''}',
+      );
+    } else {
+      await Isar.initialize();
+      _instance = Isar.open(
+        schemas: schemas,
+        directory: Isar.sqliteInMemory,
+        engine: IsarEngine.sqlite,
+      );
+    }
+
     _prepareAppLogs();
   }
 
@@ -45,7 +57,7 @@ class DB {
 
   static Future<void> _prepareAppLogs() async {
     for (final record in _earlyLogs) {
-      await appendLog(record);
+      appendLog(record);
     }
     _earlyLogs.clear();
 
@@ -56,12 +68,11 @@ class DB {
     }
   }
 
-  static Future<void> appendLog(LogRecord record) async {
+  static void appendLog(LogRecord record) async {
     if (!isReady) {
       _earlyLogs.add(record);
       return;
     }
-    final db = get();
-    await db.writeAsync((db) => db.appLogs.put(AppLog.fromLogRecord(record)));
+    get().write((db) => db.appLogs.put(AppLog.fromLogRecord(record)));
   }
 }

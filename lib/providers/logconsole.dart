@@ -14,7 +14,9 @@ class LogConsoleProvider extends ChangeNotifier {
   StreamSubscription? _watcher;
 
   LogConsoleProvider() {
-    _watcher = db.appLogs.watchLazy().listen((_) => notifyListeners());
+    if (!kIsWeb) {
+      _watcher = db.appLogs.watchLazy().listen((_) => notifyListeners());
+    }
   }
 
   @override

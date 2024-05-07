@@ -71,8 +71,10 @@ Future<void> main() async {
   await SettingsValues.init();
 
   _log.info('app version: ${AppInfo.versionVerbose}');
-  _log.info('platform:    ${Platform.operatingSystem}');
-  _log.info('os version:  ${Platform.operatingSystemVersion}');
+  if (!kIsWeb) {
+    _log.info('platform:    ${Platform.operatingSystem}');
+    _log.info('os version:  ${Platform.operatingSystemVersion}');
+  }
 
   if (periodicSyncSupported) {
     _log.info('starting periodic sync');
