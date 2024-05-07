@@ -11,6 +11,7 @@ Future<void> main() async {
   final emulators = await Emulators.build();
 
   for (final device in devices) {
+    // ignore: avoid_print
     print('Creating ${device.$1} ...');
     final proc = await emulators.toolchain.avdmanager([
       'create',

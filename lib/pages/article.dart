@@ -105,7 +105,7 @@ class _ArticlePageState extends ConsumerState<ArticlePage> {
                 icon: stateIcons[article.stateValue]!,
                 onPressed: () => syncer
                   ..add(EditArticleAction(
-                    article.id!,
+                    article.id,
                     archive: article.archivedAt == null,
                   ))
                   ..synchronize(),
@@ -115,7 +115,7 @@ class _ArticlePageState extends ConsumerState<ArticlePage> {
                 icon: starredIcons[article.starredValue]!,
                 onPressed: () => syncer
                   ..add(EditArticleAction(
-                    article.id!,
+                    article.id,
                     starred: article.starredAt == null,
                   ))
                   ..synchronize(),
@@ -184,7 +184,7 @@ class _ArticlePageState extends ConsumerState<ArticlePage> {
                       isDestructiveAction: true,
                     );
                     if (result == OkCancelResult.cancel) return;
-                    syncer.add(DeleteArticleAction(article.id!));
+                    syncer.add(DeleteArticleAction(article.id));
                     await syncer.synchronize();
                     if (toggler == null && context.mounted) {
                       context.go('/');
@@ -240,13 +240,13 @@ class _ArticlePageState extends ConsumerState<ArticlePage> {
             initialValue: article.tags,
             onConfirm: (tags) {
               RemoteSyncer.instance
-                ..add(EditArticleAction(article.id!, tags: tags))
+                ..add(EditArticleAction(article.id, tags: tags))
                 ..synchronize();
             },
           ),
         );
 
-    final scrollPositionFetch = ref.watch(scrollPositionProvider(article.id!));
+    final scrollPositionFetch = ref.watch(scrollPositionProvider(article.id));
     return scrollPositionFetch.when(
       data: (scrollPosition) {
         return NotificationListener<ScrollNotification>(

@@ -114,7 +114,7 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                           WidgetsBinding.instance.addPostFrameCallback((_) {
                             ref
                                 .read(currentArticleProvider.notifier)
-                                .maybeInit(article.id!);
+                                .maybeInit(article.id);
                           });
                         }
                         return ArticleListItem(
@@ -122,8 +122,8 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                           onTap: (article) {
                             ref
                                 .read(currentArticleProvider.notifier)
-                                .change(article.id!);
-                            widget.onItemSelect?.call(article.id!);
+                                .change(article.id);
+                            widget.onItemSelect?.call(article.id);
                           },
                           showSelection: widget.showSelectedItem,
                         );
@@ -317,7 +317,7 @@ class ArticleListItem extends ConsumerWidget {
                           icon: stateIcons[article.stateValue]!,
                           onPressed: () => syncer
                             ..add(EditArticleAction(
-                              article.id!,
+                              article.id,
                               archive: article.archivedAt == null,
                             ))
                             ..synchronize(),
@@ -327,7 +327,7 @@ class ArticleListItem extends ConsumerWidget {
                           icon: starredIcons[article.starredValue]!,
                           onPressed: () => syncer
                             ..add(EditArticleAction(
-                              article.id!,
+                              article.id,
                               starred: article.starredAt == null,
                             ))
                             ..synchronize(),
