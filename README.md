@@ -1,7 +1,6 @@
 # Frigoligo
 
-<!-- [![Chat on Matrix](https://img.shields.io/matrix/frigoligo:one.ems.host)](https://matrix.to/#/#frigoligo:one.ems.host) -->
-[![Chat on Matrix](https://matrix.to/img/matrix-badge.svg)](https://matrix.to/#/#frigoligo:one.ems.host)
+[![Chat on Matrix](https://img.shields.io/matrix/frigoligo%3Aone.ems.host?server_fqdn=matrix.org)](https://matrix.to/#/#frigoligo:one.ems.host)
 [![Translation status](https://hosted.weblate.org/widget/frigoligo/svg-badge.svg)](https://hosted.weblate.org/engage/frigoligo/)
 
 Frigoligo is a [wallabag](https://wallabag.org/) client crafted using [Flutter](https://flutter.dev/). Its core philosophy is to prioritize pragmatism and adhering to best practices when it makes sense.
@@ -16,8 +15,7 @@ Frigoligo is aiming at being:
 
 ## Installation
 
-[<img src="./assets/logos/badge_apple_app_store.svg" alt="Download on the App Store" height="60" />](https://apps.apple.com/us/app/frigoligo/id6451362294)
-[<img src="./assets/logos/badge_google_play_store.svg" alt="Get it on Google Play" height="60" />](https://play.google.com/store/apps/details?id=net.casimirlab.frigoligo)
+[<img src="./assets/logos/badge_apple_app_store.svg" alt="Download on the App Store" height="60" />](https://apps.apple.com/us/app/frigoligo/id6451362294) [<img src="./assets/logos/badge_google_play_store.svg" alt="Get it on Google Play" height="60" />](https://play.google.com/store/apps/details?id=net.casimirlab.frigoligo) [<img src="./assets/logos/badge_fdroid.svg" alt="Download on F-Droid" height="60" />](https://f-droid.org/fr/packages/net.casimirlab.frigoligo/) [<img src="./assets/logos/badge_izzyondroid.svg" alt="Download on F-Droid (Izzy)" height="60" />](https://apt.izzysoft.de/fdroid/index/apk/net.casimirlab.frigoligo)
 
 You can also download the installer from the [latest release](https://github.com/casimir/frigoligo/releases/latest) for the following platforms: Android (apk), Linux, AppImage and Windows.
 
@@ -29,8 +27,8 @@ A full history of changes is available in [CHANGELOG.md](./CHANGELOG.md).
 
 ## Screenshots
 
-|                            Mobile                             |                         Desktop                         |                              Mobile (dark)                              |
-|:-------------------------------------------------------------:|:-------------------------------------------------------:|:-----------------------------------------------------------------------:|
+|                                                   Mobile                                                    |                         Desktop                         |                                                         Mobile (dark)                                                          |
+|:-----------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------:|
 | ![mobile screenshot](./fastlane/metadata/android/en-US/images/phoneScreenshots/android_phone_1-listing.png) | ![desktop screenshot](./assets/screenshots/desktop.png) | ![mobile dark screenshot](./fastlane/metadata/android/en-US/images/phoneScreenshots/android_phone_5-reading-settings-dark.png) |
 
 ## Deeplinks

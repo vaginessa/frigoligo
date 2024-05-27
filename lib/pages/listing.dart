@@ -1,15 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'
-    hide ChangeNotifierProvider;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:popover/popover.dart';
-import 'package:provider/provider.dart';
 
 import '../buildcontext_extension.dart';
 import '../constants.dart';
+import '../dialogs/save.dart';
 import '../models/article.dart';
 import '../providers/article.dart';
 import '../providers/query.dart';
@@ -55,7 +54,7 @@ class _ListingPageState extends ConsumerState<ListingPage> {
     if (articleId != null) {
       final query = ref.read(queryProvider);
       final scrollToIndex =
-          context.read<WallabagStorage>().indexOf(articleId, query);
+          ref.read(storageProvider.notifier).indexOf(articleId, query);
       if (scrollToIndex != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _scroller.jumpTo(scrollToIndex * listingHeight);
@@ -66,12 +65,14 @@ class _ListingPageState extends ConsumerState<ListingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final storage = context.watch<WallabagStorage>();
+    final storage = ref.watch(storageProvider);
     final query = ref.watch(queryProvider);
 
     Future<void> doRefresh() async {
       _log.info('triggered refresh');
-      await context.read<RemoteSyncer>().synchronize(withFinalRefresh: true);
+      await ref
+          .read(remoteSyncerProvider.notifier)
+          .synchronize(withFinalRefresh: true);
     }
 
     final count = storage.count(query);
@@ -86,6 +87,10 @@ class _ListingPageState extends ConsumerState<ListingPage> {
               icon: const Icon(Icons.refresh),
               onPressed: doRefresh,
             ),
+          IconButton(
+            icon: const Icon(Icons.add_link),
+            onPressed: () => showSaveUrlDialog(context),
+          ),
           IconButton(
             key: const Key(wkListingSettings),
             icon: const Icon(Icons.settings),
@@ -179,8 +184,6 @@ class _TitleWidgetState extends ConsumerState<TitleWidget> {
       text += ' (★)';
     }
 
-    final storage = context.watch<WallabagStorage>();
-
     return GestureDetector(
       child: Row(
         children: [
@@ -196,13 +199,7 @@ class _TitleWidgetState extends ConsumerState<TitleWidget> {
         });
         showPopover(
           context: context,
-          bodyBuilder: (context) => MultiProvider(
-              providers: [
-                ChangeNotifierProvider.value(value: storage),
-              ],
-              builder: (context, child) {
-                return const FiltersPage();
-              }),
+          bodyBuilder: (context) => const FiltersPage(),
           direction: PopoverDirection.top,
           backgroundColor: Theme.of(context).colorScheme.surface,
           transitionDuration: const Duration(milliseconds: 150),
@@ -233,7 +230,6 @@ class ArticleListItem extends ConsumerWidget {
     // TODO explore https://pub.dev/packages/flutter_slidable
     // TODO GestureDetector on iOS
 
-    final syncer = context.read<RemoteSyncer>();
     final selectedId = ref.watch(currentArticleProvider)?.id;
 
     return Ink(
@@ -315,22 +311,26 @@ class ArticleListItem extends ConsumerWidget {
                         IconButton(
                           visualDensity: VisualDensity.compact,
                           icon: stateIcons[article.stateValue]!,
-                          onPressed: () => syncer
-                            ..add(EditArticleAction(
-                              article.id,
-                              archive: article.archivedAt == null,
-                            ))
-                            ..synchronize(),
+                          onPressed: () {
+                            ref.read(remoteSyncerProvider.notifier)
+                              ..add(EditArticleAction(
+                                article.id!,
+                                archive: article.archivedAt == null,
+                              ))
+                              ..synchronize();
+                          },
                         ),
                         IconButton(
                           visualDensity: VisualDensity.compact,
                           icon: starredIcons[article.starredValue]!,
-                          onPressed: () => syncer
-                            ..add(EditArticleAction(
-                              article.id,
-                              starred: article.starredAt == null,
-                            ))
-                            ..synchronize(),
+                          onPressed: () {
+                            ref.read(remoteSyncerProvider.notifier)
+                              ..add(EditArticleAction(
+                                article.id!,
+                                starred: article.starredAt == null,
+                              ))
+                              ..synchronize();
+                          },
                         ),
                       ],
                     ),
