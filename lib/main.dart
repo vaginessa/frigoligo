@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:background_fetch/background_fetch.dart';
@@ -6,15 +7,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'
-    hide ChangeNotifierProvider; // use ChangeNotifierProvider from provider
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logging/logging.dart';
 import 'package:neat_periodic_task/neat_periodic_task.dart';
-import 'package:provider/provider.dart';
 
 import 'app_info.dart';
+import 'applinks/handler.dart';
 import 'constants.dart';
 import 'models/db.dart';
 import 'pages/article.dart';
@@ -25,9 +25,7 @@ import 'pages/save.dart';
 import 'pages/session_details.dart';
 import 'pages/settings.dart';
 import 'providers/article.dart';
-import 'providers/deeplinks.dart';
 import 'providers/expander.dart';
-import 'providers/logconsole.dart';
 import 'providers/settings.dart';
 import 'providers/tools/observer.dart';
 import 'services/remote_sync.dart';
@@ -53,7 +51,10 @@ Future<void> main() async {
     _log.severe('uncaught error', repr, errorDetails.stack);
     FlutterError.presentError(errorDetails);
   };
+
   _log.info('starting app');
+
+  LinksHandler.init();
 
   // prevent fetching fonts from the internet, only loads the ones in the assets
   GoogleFonts.config.allowRuntimeFetching = false;
@@ -143,10 +144,7 @@ final _router = GoRouter(routes: [
   ),
   GoRoute(
     path: '/logs',
-    builder: (context, state) => ChangeNotifierProvider(
-      create: (_) => LogConsoleProvider(),
-      child: const LogConsolePage(),
-    ),
+    builder: (context, state) => const LogConsolePage(),
   ),
   GoRoute(
     path: '/articles/:id',
@@ -164,64 +162,62 @@ final _router = GoRouter(routes: [
   ),
 ]);
 
-class MyApp extends ConsumerWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => RemoteSyncer.instance),
-        ChangeNotifierProvider(
-          create: (context) {
-            return DeeplinksProvider(_router.configuration, (linkType, uri) {
-              if (linkType == Deeplink.invalid) return;
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
 
-              void pushOrGoLogin(Uri uri) {
-                if (WallabagInstance.isReady) {
-                  _router.push(uri.toString());
-                } else {
-                  _router.go('/login');
-                }
-              }
+class _MyAppState extends ConsumerState<MyApp> {
+  StreamSubscription? _deeplinksSubscription;
 
-              switch (linkType) {
-                case Deeplink.article:
-                  _router.go('/?articleId=${uri.pathSegments.last}');
-                case Deeplink.save:
-                  pushOrGoLogin(uri);
-                default:
-                  _router.go(uri.toString());
-              }
-            });
-          },
-        ),
-      ],
-      builder: (context, child) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          final deeplinks = context.read<DeeplinksProvider>();
-          if (!deeplinks.isListening) {
-            // This is ugly but... The point is listen() after _router is ready
-            Future.delayed(
-              const Duration(milliseconds: 50),
-              () => deeplinks.listen(),
-            );
-          }
-        });
+  @override
+  void initState() {
+    super.initState();
 
-        return MaterialApp.router(
-          routerConfig: _router,
-          title: 'Frigoligo',
-          theme: ThemeData(colorScheme: schemeLight, useMaterial3: true),
-          darkTheme: ThemeData(colorScheme: schemeDark, useMaterial3: true),
-          themeMode: ref.watch(themeModeProvider),
-          locale: ref.watch(languageProvider).locale,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          restorationScopeId: 'app',
-        );
-      },
+    _deeplinksSubscription =
+        LinksHandler.listen(_router.configuration, (linkType, uri) {
+      if (linkType == Deeplink.invalid) return;
+
+      void pushOrGoLogin(Uri uri) {
+        if (WallabagInstance.isReady) {
+          _router.push(uri.toString());
+        } else {
+          _router.go('/login');
+        }
+      }
+
+      switch (linkType) {
+        case Deeplink.article:
+          _router.go('/?articleId=${uri.pathSegments.last}');
+        case Deeplink.save:
+          pushOrGoLogin(uri);
+        default:
+          _router.go(uri.toString());
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      routerConfig: _router,
+      title: 'Frigoligo',
+      theme: ThemeData(colorScheme: schemeLight, useMaterial3: true),
+      darkTheme: ThemeData(colorScheme: schemeDark, useMaterial3: true),
+      themeMode: ref.watch(themeModeProvider),
+      locale: ref.watch(languageProvider).locale,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      restorationScopeId: 'app',
     );
+  }
+
+  @override
+  void dispose() {
+    _deeplinksSubscription?.cancel();
+    super.dispose();
   }
 }
 
@@ -268,23 +264,11 @@ class _MainContainerState extends ConsumerState<_MainContainer> {
 
   @override
   Widget build(BuildContext context) {
-    final syncer = context.read<RemoteSyncer>();
-
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => syncer.wallabag!),
-      ],
-      builder: (_, __) {
-        switch (Layout.windowClass(context)) {
-          case WindowClass.compact:
-            return _buildNarrowLayout();
-          case WindowClass.medium:
-            return _buildWideLayout();
-          case WindowClass.expanded:
-            return _buildDynamicLayout();
-        }
-      },
-    );
+    return switch (Layout.windowClass(context)) {
+      WindowClass.compact => _buildNarrowLayout(),
+      WindowClass.medium => _buildWideLayout(),
+      WindowClass.expanded => _buildDynamicLayout(),
+    };
   }
 
   Widget _buildNarrowLayout() {
@@ -296,26 +280,22 @@ class _MainContainerState extends ConsumerState<_MainContainer> {
   }
 
   Widget _buildWideLayout() {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<Expander>(create: (_) => Expander()),
+    final expanded = ref.watch(expanderProvider);
+    return Row(
+      children: [
+        if (!expanded)
+          const Flexible(
+            flex: 1,
+            child: ListingPage(),
+          ),
+        Flexible(
+          flex: 2,
+          child: ArticlePage(
+            withExpander: true,
+            withProgressIndicator: expanded,
+          ),
+        ),
       ],
-      builder: (context, _) {
-        final expander = context.watch<Expander>();
-        return Row(
-          children: [
-            if (!expander.expanded)
-              const Flexible(
-                flex: 1,
-                child: ListingPage(),
-              ),
-            Flexible(
-              flex: 2,
-              child: ArticlePage(withProgressIndicator: expander.expanded),
-            ),
-          ],
-        );
-      },
     );
   }
 
