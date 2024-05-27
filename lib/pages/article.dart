@@ -108,7 +108,7 @@ class _ArticlePageState extends ConsumerState<ArticlePage> {
                 onPressed: () {
                   ref.read(remoteSyncerProvider.notifier)
                     ..add(EditArticleAction(
-                      article.id!,
+                      article.id,
                       archive: article.archivedAt == null,
                     ))
                     ..synchronize();
@@ -120,7 +120,7 @@ class _ArticlePageState extends ConsumerState<ArticlePage> {
                 onPressed: () {
                   ref.read(remoteSyncerProvider.notifier)
                     ..add(EditArticleAction(
-                      article.id!,
+                      article.id,
                       starred: article.starredAt == null,
                     ))
                     ..synchronize();
@@ -247,7 +247,7 @@ class _ArticlePageState extends ConsumerState<ArticlePage> {
             initialValue: article.tags,
             onConfirm: (tags) {
               ref.read(remoteSyncerProvider.notifier)
-                ..add(EditArticleAction(article.id!, tags: tags))
+                ..add(EditArticleAction(article.id, tags: tags))
                 ..synchronize();
             },
           ),

@@ -314,7 +314,7 @@ class ArticleListItem extends ConsumerWidget {
                           onPressed: () {
                             ref.read(remoteSyncerProvider.notifier)
                               ..add(EditArticleAction(
-                                article.id!,
+                                article.id,
                                 archive: article.archivedAt == null,
                               ))
                               ..synchronize();
@@ -326,7 +326,7 @@ class ArticleListItem extends ConsumerWidget {
                           onPressed: () {
                             ref.read(remoteSyncerProvider.notifier)
                               ..add(EditArticleAction(
-                                article.id!,
+                                article.id,
                                 starred: article.starredAt == null,
                               ))
                               ..synchronize();
