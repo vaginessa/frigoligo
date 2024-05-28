@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,7 +20,7 @@ import '../widget_keys.dart';
 final _log = Logger('settings');
 
 final _settingsSectionSplitter =
-    Platform.isAndroid || Platform.isLinux || Platform.isFuchsia
+    !kIsWeb && (Platform.isAndroid || Platform.isLinux || Platform.isFuchsia)
         ? const Text('')
         : null;
 
