@@ -51,11 +51,12 @@ final isDesktopPlatform =
     kIsWeb || Platform.isLinux || Platform.isMacOS || Platform.isWindows;
 final isMobilePlatform = !kIsWeb && (Platform.isAndroid || Platform.isIOS);
 
-final appBadgeSupported = isMobilePlatform || Platform.isMacOS;
+final appBadgeSupported = isMobilePlatform || (!kIsWeb && Platform.isMacOS);
 const appGroupId = 'group.net.casimir-lab.frigoligo';
 
 final periodicSyncSupported = isDesktopPlatform;
 const Duration periodicSyncInterval = Duration(minutes: 15);
 const Duration periodicSyncTimeout = Duration(minutes: 10);
 
-final pullToRefreshSupported = isMobilePlatform || Platform.isMacOS;
+final pullToRefreshSupported =
+    isMobilePlatform || (!kIsWeb && Platform.isMacOS);
