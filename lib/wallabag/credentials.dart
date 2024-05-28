@@ -83,7 +83,7 @@ class CredentialsManager {
   }
 
   Future<void> _saveString(String key, String value) async {
-    if (Platform.isIOS) {
+    if (!kIsWeb && Platform.isIOS) {
       await SharedPreferenceAppGroup.setString(key, value);
     } else {
       await SharedPreferences.getInstance()
@@ -106,7 +106,7 @@ class CredentialsManager {
 
   Future<void> clear() async {
     credentials = null;
-    if (Platform.isIOS) {
+    if (!kIsWeb && Platform.isIOS) {
       await SharedPreferenceAppGroup.remove(credentialsKey);
     } else {
       final prefs = await SharedPreferences.getInstance();
